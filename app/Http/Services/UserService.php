@@ -3,10 +3,10 @@
 namespace App\Http\Services;
 
 use Exception;
+use App\Models\Gifts;
 use App\Http\Helpers\CacheClient;
 use App\Http\Helpers\HttpClient;
 use App\Http\Helpers\ResponseFormater;
-use Illuminate\Support\Facades\Log;
 
 class UserService
 {
@@ -51,9 +51,11 @@ class UserService
         }
 
         $path = 'data';
-        $validFields = ['id' => 'external_id', 'embed_url' => 'url', 'title' => 'name'];
+        $validFields = ['id' => 'external_id', 'embed_url' => 'url', 'title' => 'title'];
 
         $output = $this->formater::format($response->data, $path, $validFields);
+
+        Gifts::insert($output);
 
         $this->cache->set($identifier, $output, 120);
 
@@ -85,9 +87,11 @@ class UserService
         $response->data['data'] = [$response->data['data']];
 
         $path = 'data';
-        $validFields = ['id' => 'external_id', 'embed_url' => 'url', 'title' => 'name'];
+        $validFields = ['id' => 'external_id', 'embed_url' => 'url', 'title' => 'title'];
 
         $output = $this->formater::format($response->data, $path, $validFields);
+
+        Gifts::insert($output);
 
         $this->cache->set($identifier, $output[0], 120);
 
