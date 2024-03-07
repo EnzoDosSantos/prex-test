@@ -16,7 +16,7 @@ class ResponseFormater implements IFormater
     {
         $formattedData = [];
 
-        foreach($toFormat[$path] as $k => $dataItem) {
+        foreach($toFormat[$path] as $dataItem) {
             $formattedItem = [];
 
             foreach ($allowedFields as $originalField => $formattedField) {
