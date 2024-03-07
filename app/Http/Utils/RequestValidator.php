@@ -27,13 +27,18 @@ class RequestValidator
                 'email' => 'required|email|max:40',
                 'password' => 'required|string'
             ],
-            'searchGifts' => [
+            'searchExternalGifts' => [
                 'query' => 'required|string|max:40',
                 'limit' => 'nullable|integer',
                 'offset' => 'nullable|integer',
             ],
-            'searchGift' => [
+            'searchExternalGift' => [
                 'id' => 'required'
+            ],
+            'searchInternalGifts' => [
+                'query' => 'required|string|max:40',
+                'limit' => 'nullable|integer',
+                'offset' => 'nullable|integer',
             ]
         ];
 

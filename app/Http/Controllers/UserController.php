@@ -17,14 +17,14 @@ class UserController extends Controller
         $this->userService = $userService;
     }
 
-    public function searchGifts(Request $request): JsonResponse
+    public function searchExternalGifts(Request $request): JsonResponse
     {
         try {
-            new RequestValidator($request, 'searchGifts');
+            new RequestValidator($request, 'searchExternalGifts');
 
             $params = $request->only(['query', 'limit', 'offset']);
 
-            $response = $this->userService->searchGifts($params);
+            $response = $this->userService->searchGifts('EXTERNAL', $params);
 
             return response()->json(['gifts' => $response], 200, [], JSON_UNESCAPED_SLASHES);
         } catch (Exception $e) {
@@ -32,14 +32,40 @@ class UserController extends Controller
         }
     }
 
-    public function searchGift(Request $request): JsonResponse
+    public function searchExternalGift(Request $request): JsonResponse
     {
         try {
-            new RequestValidator($request, 'searchGift');
+            new RequestValidator($request, 'searchExternalGift');
 
             $id = $request->input('id');
 
-            $response = $this->userService->searchGift($id);
+            $response = $this->userService->searchGift('EXTERNAL', $id);
+
+            return response()->json(['gift' => $response], 200, [], JSON_UNESCAPED_SLASHES);
+        } catch (Exception $e) {
+            return $this->handleException($e);
+        }
+    }
+
+    public function searchInternalGifts(Request $request): JsonResponse
+    {
+        try {
+            new RequestValidator($request, 'searchInternalGifts');
+
+            $params = $request->only(['query', 'limit', 'offset']);
+
+            $response = $this->userService->searchGifts('INTERNAL', $params);
+
+            return response()->json(['gifts' => $response], 200, [], JSON_UNESCAPED_SLASHES);
+        } catch (Exception $e) {
+            return $this->handleException($e);
+        }
+    }
+
+    public function searchInternalGift(Request $request, int $id): JsonResponse
+    {
+        try {
+            $response = $this->userService->searchGift('INTERNAL', $id);
 
             return response()->json(['gift' => $response], 200, [], JSON_UNESCAPED_SLASHES);
         } catch (Exception $e) {

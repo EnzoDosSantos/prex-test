@@ -22,67 +22,61 @@ class UserService
         $this->cache = $cache;
     }
 
-    public function searchGifts(array $params): array
+    public function searchGifts(string $driver, array $params): array
     {
         $search = $params['query'];
-        $limit = $params['limit'] ?? 2;
+        $limit = $params['limit'] ?? 10;
         $offset = $params['offset'] ?? 0;
 
-        $identifier = $search . '_limit_' . $limit . '_offset_' . $offset;
+        $cacheKey = $search . '_limit_' . $limit . '_offset_' . $offset . '_driver_' . $driver;
 
-        $cached = $this->cache->get($identifier);
+        $cached = $this->cache->get($cacheKey);
 
         if(isset($cached)){
             return $cached;
         }
 
-        $token = 'AhYIFREbw68cipBiUT9YxHAmBhCWu8mz';
-
-        $endpoint = "https://api.giphy.com/v1/gifs/search?api_key=$token&q=$search&limit=$limit&offset=$offset";
-
-        $response = $this->httpClient->get($endpoint);
-
-        if($response->error){
-            throw new Exception('Error fetching data: ' . $response->msg, $response->status);
+        if($driver === 'EXTERNAL'){
+            $gifts = $this->searchExternalGifts($search, $limit, $offset);
+        } else {
+            $gifts = $this->searchInternalGifts($search, $limit, $offset);
         }
 
-        if(sizeof($response->data['data']) === 0){
-            throw new Exception('No results available on search: ' . $search , 404);
-        }
+        $this->cache->set($cacheKey, $gifts, 120);
 
-        $path = 'data';
-        $validFields = ['id' => 'external_id', 'embed_url' => 'url', 'title' => 'title'];
-
-        $output = $this->formater::format($response->data, $path, $validFields);
-
-        Gifts::insert($output);
-
-        $this->cache->set($identifier, $output, 120);
-
-        return $output;
+        return $gifts;
     }
 
-    public function searchGift(string $identifier): array
+    public function searchGift(string $driver, string $identifier): array
     {
-        $cached = $this->cache->get($identifier);
+        $cacheKey = $identifier . '_driver_' . $driver;
+
+        $cached = $this->cache->get($cacheKey);
 
         if(isset($cached)){
             return $cached;
         }
 
+        if($driver === 'EXTERNAL'){
+            $gift = $this->searchExternalGift($identifier);
+        } else {
+            $gift = $this->searchInternalGift($identifier);
+        }
+
+        $this->cache->set($cacheKey, $gift, 120);
+
+        return $gift;
+    }
+
+    private function searchExternalGift(string $identifier): array
+    {
         $token = 'AhYIFREbw68cipBiUT9YxHAmBhCWu8mz';
 
         $endpoint = "https://api.giphy.com/v1/gifs/$identifier?api_key=$token";
 
         $response = $this->httpClient->get($endpoint);
 
-        if($response->error){
-            throw new Exception("Error fetching data on search: $identifier. Message: $response->msg", $response->status);
-        }
-
-        if(sizeof($response->data['data']) === 0){
-            throw new Exception("No results available on search: $identifier" , 404);
-        }
+        $this->validateGiftResponse($identifier, $response);
 
         $response->data['data'] = [$response->data['data']];
 
@@ -93,8 +87,65 @@ class UserService
 
         Gifts::insert($output);
 
-        $this->cache->set($identifier, $output[0], 120);
-
         return $output[0];
+    }
+
+    private function searchInternalGift(int $identifier): array
+    {
+        $gift = Gifts::find($identifier);
+
+        if(!isset($gift)){
+            throw new Exception("No results available on search: $identifier" , 404);
+        }
+
+        return $gift->toArray();
+    }
+
+    private function searchExternalGifts(string $search, string|int $limit, string|int $offset): array
+    {
+        $token = 'AhYIFREbw68cipBiUT9YxHAmBhCWu8mz';
+
+        $endpoint = "https://api.giphy.com/v1/gifs/search?api_key=$token&q=$search&limit=$limit&offset=$offset";
+
+        $response = $this->httpClient->get($endpoint);
+
+        $this->validateGiftResponse($search, $response);
+
+        $path = 'data';
+        $validFields = ['id' => 'external_id', 'embed_url' => 'url', 'title' => 'title'];
+
+        $gifts = $this->formater::format($response->data, $path, $validFields);
+
+        Gifts::insert($gifts);
+
+        return $gifts;
+    }
+
+    private function searchInternalGifts(string $search, string|int $limit, string|int $offset): array
+    {
+        $gifts = Gifts::where('title', 'like', '%' . $search . '%')
+                    ->limit($limit)
+                    ->offset($offset)
+                    ->get()
+                    ->toArray();
+
+        if(sizeof($gifts) === 0){
+            throw new Exception("No results available on search: $search" , 404);
+        }
+
+        return $gifts;
+    }
+
+    private function validateGiftResponse(string $identifier, object $response): void
+    {
+        if($response->error){
+            throw new Exception("Error fetching data on search: $identifier. Message: $response->msg", $response->status);
+        }
+
+        if(sizeof($response->data['data']) === 0){
+            throw new Exception("No results available on search: $identifier" , 404);
+        }
+
+        return;
     }
 }
