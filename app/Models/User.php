@@ -8,6 +8,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
+use App\Models\UserGifts;
+
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
@@ -24,4 +26,9 @@ class User extends Authenticatable
         'created_at',
         'updated_at',
     ];
+
+    public function gifts()
+    {
+        return $this->hasMany(UserGifts::class, 'user_id', 'id');
+    }
 }
