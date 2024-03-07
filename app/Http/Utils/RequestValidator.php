@@ -27,21 +27,21 @@ class RequestValidator
                 'email' => 'required|email|max:40',
                 'password' => 'required|string'
             ],
-            'searchExternalGifts' => [
+            'searchExternalGifs' => [
                 'query' => 'required|string|max:40',
                 'limit' => 'nullable|integer',
                 'offset' => 'nullable|integer',
             ],
-            'searchExternalGift' => [
+            'searchExternalGif' => [
                 'id' => 'required'
             ],
-            'searchInternalGifts' => [
+            'searchInternalGifs' => [
                 'query' => 'required|string|max:40',
                 'limit' => 'nullable|integer',
                 'offset' => 'nullable|integer',
             ],
-            'setFavouriteGift' => [
-                'id' => 'required|integer|exists:cat_gifts,id',
+            'setFavouriteGif' => [
+                'id' => 'required|integer|exists:cat_gifs,id',
                 'alias' => 'required|string',
                 'user_id' => 'required|integer|exists:prex_user,id',
             ]
@@ -73,7 +73,7 @@ class RequestValidator
             'query' => 'query',
             'limit' => 'limit',
             'offset' => 'offset',
-            'id' => 'gift id',
+            'id' => 'gif id',
             'alias' => 'alias',
             'user_id' => 'user id',
         ];

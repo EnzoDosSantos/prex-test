@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Gifts;
+use App\Models\Gifs;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Faker\Factory as Faker;
@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->seedUserTable();
-        $this->seedGiftTable();
+        $this->seedGifTable();
     }
 
     private function seedUserTable(): void
@@ -36,24 +36,24 @@ class DatabaseSeeder extends Seeder
         ]);
     }
 
-    private function seedGiftTable(): void
+    private function seedGifTable(): void
     {
         $faker = Faker::create('es_ES');
 
-        $gifts = [];
+        $gifs = [];
 
         foreach(range(1, 50) as $idx){
 
-            $toInsertGift = [];
+            $toInsertGif = [];
 
-            $toInsertGift['external_id'] = $faker->uuid;
-            $toInsertGift['title'] = $faker->realText;
-            $toInsertGift['url'] = $faker->url();
+            $toInsertGif['external_id'] = $faker->uuid;
+            $toInsertGif['title'] = $faker->realText;
+            $toInsertGif['url'] = $faker->url();
 
-            $gifts[] = $toInsertGift;
+            $gifs[] = $toInsertGif;
 
         }
 
-        Gifts::insert($gifts);
+        Gifs::insert($gifs);
     }
 }

@@ -18,69 +18,69 @@ class UserController extends Controller
         $this->userService = $userService;
     }
 
-    public function searchExternalGifts(Request $request): JsonResponse
+    public function searchExternalGifs(Request $request): JsonResponse
     {
         try {
-            new RequestValidator($request, 'searchExternalGifts');
+            new RequestValidator($request, 'searchExternalGifs');
 
             $params = $request->only(['query', 'limit', 'offset']);
 
-            $response = $this->userService->searchGifts('EXTERNAL', $params);
+            $response = $this->userService->searchGifs('EXTERNAL', $params);
 
-            return response()->json(['gifts' => $response], 200, [], JSON_UNESCAPED_SLASHES);
+            return response()->json(['gifs' => $response], 200, [], JSON_UNESCAPED_SLASHES);
         } catch (Exception $e) {
             return $this->handleException($e);
         }
     }
 
-    public function searchExternalGift(Request $request): JsonResponse
+    public function searchExternalGif(Request $request): JsonResponse
     {
         try {
-            new RequestValidator($request, 'searchExternalGift');
+            new RequestValidator($request, 'searchExternalGif');
 
             $id = $request->input('id');
 
-            $response = $this->userService->searchGift('EXTERNAL', $id);
+            $response = $this->userService->searchGif('EXTERNAL', $id);
 
-            return response()->json(['gift' => $response], 200, [], JSON_UNESCAPED_SLASHES);
+            return response()->json(['gif' => $response], 200, [], JSON_UNESCAPED_SLASHES);
         } catch (Exception $e) {
             return $this->handleException($e);
         }
     }
 
-    public function searchInternalGifts(Request $request): JsonResponse
+    public function searchInternalGifs(Request $request): JsonResponse
     {
         try {
-            new RequestValidator($request, 'searchInternalGifts');
+            new RequestValidator($request, 'searchInternalGifs');
 
             $params = $request->only(['query', 'limit', 'offset']);
 
-            $response = $this->userService->searchGifts('INTERNAL', $params);
+            $response = $this->userService->searchGifs('INTERNAL', $params);
 
-            return response()->json(['gifts' => $response], 200, [], JSON_UNESCAPED_SLASHES);
+            return response()->json(['gifs' => $response], 200, [], JSON_UNESCAPED_SLASHES);
         } catch (Exception $e) {
             return $this->handleException($e);
         }
     }
 
-    public function searchInternalGift(Request $request, int $id): JsonResponse
+    public function searchInternalGif(Request $request, int $id): JsonResponse
     {
         try {
-            $response = $this->userService->searchGift('INTERNAL', $id);
+            $response = $this->userService->searchGif('INTERNAL', $id);
 
-            return response()->json(['gift' => $response], 200, [], JSON_UNESCAPED_SLASHES);
+            return response()->json(['gif' => $response], 200, [], JSON_UNESCAPED_SLASHES);
         } catch (Exception $e) {
             return $this->handleException($e);
         }
     }
 
-    public function updateFavouriteGift(Request $request): JsonResponse
+    public function updateFavouriteGif(Request $request): JsonResponse
     {
         try {
-            new RequestValidator($request, 'setFavouriteGift');
+            new RequestValidator($request, 'setFavouriteGif');
 
-            $giftId = $request->input('id');
-            $giftAlias = $request->input('alias');
+            $gifId = $request->input('id');
+            $gifAlias = $request->input('alias');
             $userId = $request->input('user_id');
 
             $user = Auth::user();
@@ -89,7 +89,7 @@ class UserController extends Controller
                 throw new Exception('Unauthorized or expired token.', 401);
             }
 
-            $response = $this->userService->updateOrDeleteGift($userId, $giftId, $giftAlias);
+            $response = $this->userService->updateOrDeleteGif($userId, $gifId, $gifAlias);
 
             return response()->json(['message' => $response->message], $response->code, [], JSON_UNESCAPED_SLASHES);
         } catch (Exception $e) {

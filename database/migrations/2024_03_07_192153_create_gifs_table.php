@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cat_gifts', function (Blueprint $table) {
+        Schema::create('cat_gifs', function (Blueprint $table) {
             $table->id();
             $table->string('external_id');
             $table->string('title');
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cat_gifts');
+        Schema::dropIfExists('cat_gifs');
     }
 };

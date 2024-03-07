@@ -21,12 +21,12 @@ Route::prefix('auth')->group(function(){
 
 
 Route::prefix('external')->middleware('auth:sanctum')->group(function(){
-    Route::get('/gifts', [UserController::class, 'searchExternalGifts'])->middleware('log:EXTERNAL_SEARCH_GIFTS');
-    Route::get('/gift', [UserController::class, 'searchExternalGift'])->middleware('log:EXTERNAL_SEARCH_GIFT');
+    Route::get('/gifs', [UserController::class, 'searchExternalGifs'])->middleware('log:EXTERNAL_SEARCH_GIFS');
+    Route::get('/gif', [UserController::class, 'searchExternalGif'])->middleware('log:EXTERNAL_SEARCH_GIF');
 });
 
 Route::prefix('internal')->middleware('auth:sanctum')->group(function(){
-    Route::get('/gifts', [UserController::class, 'searchInternalGifts'])->middleware('log:INTERNAL_SEARCH_GIFTS');
-    Route::get('/gift/{id}', [UserController::class, 'searchInternalGift'])->middleware('log:INTERNAL_SEARCH_GIFT');
-    Route::post('/gift', [UserController::class, 'updateFavouriteGift'])->middleware('log:INTERNAL_FAVOURITE_GIFT');
+    Route::get('/gifs', [UserController::class, 'searchInternalGifs'])->middleware('log:INTERNAL_SEARCH_GIFS');
+    Route::get('/gif/{id}', [UserController::class, 'searchInternalGif'])->middleware('log:INTERNAL_SEARCH_GIF');
+    Route::post('/gif', [UserController::class, 'updateFavouriteGif'])->middleware('log:INTERNAL_FAVOURITE_GIF');
 });
