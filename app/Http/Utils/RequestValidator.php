@@ -39,37 +39,45 @@ class RequestValidator
                 'query' => 'required|string|max:40',
                 'limit' => 'nullable|integer',
                 'offset' => 'nullable|integer',
+            ],
+            'setFavouriteGift' => [
+                'id' => 'required|integer|exists:cat_gifts,id',
+                'alias' => 'required|string',
+                'user_id' => 'required|integer|exists:prex_user,id',
             ]
         ];
 
         $messages = [
-            'required' => 'El valor :attribute es obligatorio.',
-            'email' => 'El valor :attribute debe ser una dirección de correo electrónico válida.',
-            'max' => 'El valor :attribute no debe tener más de :max caracteres.',
-            'unique' => 'El valor :attribute ya está registrado.',
-            'min' => 'El valor :attribute debe tener al menos :min caracteres.',
-            'numeric' => 'El valor :attribute debe ser numérico.',
-            'integer' => 'El valor :attribute debe ser un entero.',
-            'string' => 'El valor :attribute debe ser una cadena de texto.',
-            'digits' => 'El valor :attribute debe tener :digits dígitos.',
-            'date' => 'La :attribute debe ser una fecha válida.',
-            'date_format' => 'La :attribute debe seguir el formato acordado.',
-            'array' => 'Las :attribute deben ser un arreglo valido.',
-            'in' => 'El valor :attribute debe estar entre los valores acordados.',
-            'required_with' => 'El valor :attribute es requerido.',
-            'required_if' => 'El valor :attribute es requerido.',
-            'exists' => 'El valor :attribute no existe en nuestros registros.',
-            'regex' => 'El valor :attribute debe cumplir con los requisitos mínimos.',
+            'required' => 'The :attribute field is required.',
+            'email' => 'The :attribute must be a valid email address.',
+            'max' => 'The :attribute must not be more than :max characters.',
+            'unique' => 'The :attribute has already been taken.',
+            'min' => 'The :attribute must be at least :min characters.',
+            'numeric' => 'The :attribute must be a number.',
+            'integer' => 'The :attribute must be an integer.',
+            'string' => 'The :attribute must be a string.',
+            'digits' => 'The :attribute must have :digits digits.',
+            'date' => 'The :attribute must be a valid date.',
+            'date_format' => 'The :attribute must follow the agreed format.',
+            'array' => 'The :attribute must be a valid array.',
+            'in' => 'The :attribute must be one of the following values.',
+            'required_with' => 'The :attribute is required when :other is present.',
+            'required_if' => 'The :attribute is required when :other is :value.',
+            'exists' => 'The selected :attribute is invalid.',
+            'regex' => 'The :attribute format is invalid.',
         ];
 
         $attributes = [
             'email' => 'email',
-            'password' => 'contraseña',
+            'password' => 'password',
             'query' => 'query',
             'limit' => 'limit',
             'offset' => 'offset',
-            'id' => 'id',
+            'id' => 'gift id',
+            'alias' => 'alias',
+            'user_id' => 'user id',
         ];
+
 
         $validator = Validator::make($this->request->all(), $validationRules[$this->path], $messages, $attributes);
 
