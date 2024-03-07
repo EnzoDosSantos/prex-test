@@ -26,6 +26,14 @@ class RequestValidator
             'createSession' => [
                 'email' => 'required|email|max:40',
                 'password' => 'required|string'
+            ],
+            'searchGifts' => [
+                'query' => 'required|string|max:40',
+                'limit' => 'nullable|integer',
+                'offset' => 'nullable|integer',
+            ],
+            'searchGift' => [
+                'id' => 'required'
             ]
         ];
 
@@ -52,6 +60,10 @@ class RequestValidator
         $attributes = [
             'email' => 'email',
             'password' => 'contraseña',
+            'query' => 'query',
+            'limit' => 'limit',
+            'offset' => 'offset',
+            'id' => 'id',
         ];
 
         $validator = Validator::make($this->request->all(), $validationRules[$this->path], $messages, $attributes);
