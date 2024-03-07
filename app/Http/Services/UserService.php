@@ -89,8 +89,8 @@ class UserService
 
         $output = $this->formater::format($response->data, $path, $validFields);
 
-        $this->cache->set($identifier, $output, 120);
+        $this->cache->set($identifier, $output[0], 120);
 
-        return $output;
+        return $output[0];
     }
 }
