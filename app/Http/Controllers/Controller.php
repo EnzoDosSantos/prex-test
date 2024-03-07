@@ -17,7 +17,14 @@ class Controller extends BaseController
         $code = $exception->getCode();
 
         if($code === 400){
-            $error = json_decode($exception->getMessage());
+            $execeptionMessage = $exception->getMessage();
+
+            if($this->isJson($execeptionMessage)){
+                $error = json_decode($exception->getMessage());
+            } else {
+                $error = $execeptionMessage;
+            }
+
         } else {
 
             if($code === 0){
@@ -29,4 +36,9 @@ class Controller extends BaseController
 
         return response()->json(['error' => $error], $code, ['Content-Type' => 'application/json']);
     }
+
+    private function isJson($string) {
+        json_decode($string);
+        return json_last_error() === JSON_ERROR_NONE;
+     }
 }
