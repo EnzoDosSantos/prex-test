@@ -20,7 +20,12 @@ Route::prefix('auth')->group(function(){
 });
 
 
-Route::prefix('users')->middleware('auth:sanctum')->group(function(){
-    Route::get('/gifts', [UserController::class, 'searchGifts'])->middleware('log:SEARCH_GIFTS');
-    Route::get('/gift', [UserController::class, 'searchGift'])->middleware('log:SEARCH_GIFT');
+Route::prefix('external')->middleware('auth:sanctum')->group(function(){
+    Route::get('/gifts', [UserController::class, 'searchExternalGifts'])->middleware('log:EXTERNAL_SEARCH_GIFTS');
+    Route::get('/gift', [UserController::class, 'searchExternalGift'])->middleware('log:EXTERNAL_SEARCH_GIFT');
+});
+
+Route::prefix('internal')->middleware('auth:sanctum')->group(function(){
+    Route::get('/gifts', [UserController::class, 'searchInternalGifts'])->middleware('log:INTERNAL_SEARCH_GIFTS');
+    Route::get('/gift/{id}', [UserController::class, 'searchInternalGift'])->middleware('log:INTERNAL_SEARCH_GIFT');
 });
