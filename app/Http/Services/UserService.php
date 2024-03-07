@@ -3,11 +3,11 @@
 namespace App\Http\Services;
 
 use Exception;
-use App\Models\Gifts;
+use App\Models\Gifs;
 use App\Http\Helpers\CacheClient;
 use App\Http\Helpers\HttpClient;
 use App\Http\Helpers\ResponseFormater;
-use App\Models\UserGifts;
+use App\Models\UserGifs;
 
 class UserService
 {
@@ -23,7 +23,7 @@ class UserService
         $this->cache = $cache;
     }
 
-    public function searchGifts(string $driver, array $params): array
+    public function searchGifs(string $driver, array $params): array
     {
         $search = $params['query'];
         $limit = $params['limit'] ?? 10;
@@ -38,17 +38,17 @@ class UserService
         }
 
         if($driver === 'EXTERNAL'){
-            $gifts = $this->searchExternalGifts($search, $limit, $offset);
+            $gifs = $this->searchExternalGifs($search, $limit, $offset);
         } else {
-            $gifts = $this->searchInternalGifts($search, $limit, $offset);
+            $gifs = $this->searchInternalGifs($search, $limit, $offset);
         }
 
-        $this->cache->set($cacheKey, $gifts, 120);
+        $this->cache->set($cacheKey, $gifs, 120);
 
-        return $gifts;
+        return $gifs;
     }
 
-    public function searchGift(string $driver, string $identifier): array
+    public function searchGif(string $driver, string $identifier): array
     {
         $cacheKey = $identifier . '_driver_' . $driver;
 
@@ -59,42 +59,42 @@ class UserService
         }
 
         if($driver === 'EXTERNAL'){
-            $gift = $this->searchExternalGift($identifier);
+            $gif = $this->searchExternalGif($identifier);
         } else {
-            $gift = $this->searchInternalGift($identifier);
+            $gif = $this->searchInternalGif($identifier);
         }
 
-        $this->cache->set($cacheKey, $gift, 120);
+        $this->cache->set($cacheKey, $gif, 120);
 
-        return $gift;
+        return $gif;
     }
 
-    public function updateOrDeleteGift(int $userId, int $giftId, string $giftAlias): object
+    public function updateOrDeleteGif(int $userId, int $gifId, string $gifAlias): object
     {
-        $gift = UserGifts::where('user_id', $userId)
-                        ->where('gift_id', $giftId)
+        $gif = UserGifs::where('user_id', $userId)
+                        ->where('gif_id', $gifId)
                         ->first();
 
-        if(isset($gift)){
-            $gift->delete();
+        if(isset($gif)){
+            $gif->delete();
 
             $message = 'Gif has been removed from favorites.';
             $code = 200;
         } else {
-            UserGifts::create([
+            UserGifs::create([
                 'user_id' => $userId,
-                'gift_id' => $giftId,
-                'alias' => $giftAlias
+                'gif_id' => $gifId,
+                'alias' => $gifAlias
             ]);
 
-            $message = 'The gift has been saved in favorites.';
+            $message = 'The gif has been saved in favorites.';
             $code = 201;
         }
 
         return (object) ['message' => $message, 'code' => $code];
     }
 
-    private function searchExternalGift(string $identifier): array
+    private function searchExternalGif(string $identifier): array
     {
         $token = 'AhYIFREbw68cipBiUT9YxHAmBhCWu8mz';
 
@@ -102,7 +102,7 @@ class UserService
 
         $response = $this->httpClient->get($endpoint);
 
-        $this->validateGiftResponse($identifier, $response);
+        $this->validateGifResponse($identifier, $response);
 
         $response->data['data'] = [$response->data['data']];
 
@@ -111,30 +111,30 @@ class UserService
 
         $output = $this->formater::format($response->data, $path, $validFields);
 
-        Gifts::insert($output);
+        Gifs::insert($output);
 
         return $output[0];
     }
 
-    private function searchInternalGift(int $identifier): array
+    private function searchInternalGif(int $identifier): array
     {
 
         if(is_numeric($identifier)){
-            $gift = Gifts::find($identifier);
+            $gif = Gifs::find($identifier);
         } else {
-            $gift = Gifts::where('external_id', $identifier)
+            $gif = Gifs::where('external_id', $identifier)
                         ->first();
         }
 
 
-        if(!isset($gift)){
+        if(!isset($gif)){
             throw new Exception("No results available on search: $identifier" , 404);
         }
 
-        return $gift->toArray();
+        return $gif->toArray();
     }
 
-    private function searchExternalGifts(string $search, string|int $limit, string|int $offset): array
+    private function searchExternalGifs(string $search, string|int $limit, string|int $offset): array
     {
         $token = 'AhYIFREbw68cipBiUT9YxHAmBhCWu8mz';
 
@@ -142,34 +142,34 @@ class UserService
 
         $response = $this->httpClient->get($endpoint);
 
-        $this->validateGiftResponse($search, $response);
+        $this->validateGifResponse($search, $response);
 
         $path = 'data';
         $validFields = ['id' => 'external_id', 'embed_url' => 'url', 'title' => 'title'];
 
-        $gifts = $this->formater::format($response->data, $path, $validFields);
+        $gifs = $this->formater::format($response->data, $path, $validFields);
 
-        Gifts::insert($gifts);
+        Gifs::insert($gifs);
 
-        return $gifts;
+        return $gifs;
     }
 
-    private function searchInternalGifts(string $search, string|int $limit, string|int $offset): array
+    private function searchInternalGifs(string $search, string|int $limit, string|int $offset): array
     {
-        $gifts = Gifts::where('title', 'like', '%' . $search . '%')
+        $gifs = Gifs::where('title', 'like', '%' . $search . '%')
                     ->limit($limit)
                     ->offset($offset)
                     ->get()
                     ->toArray();
 
-        if(sizeof($gifts) === 0){
+        if(sizeof($gifs) === 0){
             throw new Exception("No results available on search: $search" , 404);
         }
 
-        return $gifts;
+        return $gifs;
     }
 
-    private function validateGiftResponse(string $identifier, object $response): void
+    private function validateGifResponse(string $identifier, object $response): void
     {
         if($response->error){
             throw new Exception("Error fetching data on search: $identifier. Message: $response->msg", $response->status);

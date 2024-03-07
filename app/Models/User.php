@@ -8,7 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-use App\Models\UserGifts;
+use App\Models\UserGifs;
 
 class User extends Authenticatable
 {
@@ -27,8 +27,8 @@ class User extends Authenticatable
         'updated_at',
     ];
 
-    public function gifts()
+    public function gifs()
     {
-        return $this->hasMany(UserGifts::class, 'user_id', 'id');
+        return $this->hasMany(UserGifs::class, 'user_id', 'id');
     }
 }

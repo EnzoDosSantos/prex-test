@@ -5,16 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
-use App\Models\Gifts;
+use App\Models\Gifs;
 
-class UserGifts extends Model
+class UserGifs extends Model
 {
     use HasFactory;
 
-    protected $table = 'prex_user_gifts';
+    protected $table = 'prex_user_gifs';
     protected $fillable = [
         'user_id',
-        'gift_id',
+        'gif_id',
         'alias'
     ];
 
@@ -30,8 +30,8 @@ class UserGifts extends Model
         return $this->hasOne(User::class, 'id', 'user_id');
     }
 
-    public function gift()
+    public function gif()
     {
-        return $this->hasOne(Gifts::class, 'id', 'gift_id');
+        return $this->hasOne(Gifs::class, 'id', 'gif_id');
     }
 }

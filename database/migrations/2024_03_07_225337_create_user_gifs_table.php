@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('prex_user_gifts', function (Blueprint $table) {
+        Schema::create('prex_user_gifs', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('user_id')->unsigned()->index();
             $table->foreign('user_id')->references('id')->on('prex_user')->onDelete('no action');
-            $table->bigInteger('gift_id')->unsigned()->index();
-            $table->foreign('gift_id')->references('id')->on('cat_gifts')->onDelete('no action');
+            $table->bigInteger('gif_id')->unsigned()->index();
+            $table->foreign('gif_id')->references('id')->on('cat_gifs')->onDelete('no action');
             $table->string('alias');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('prex_user_gifts');
+        Schema::dropIfExists('prex_user_gifs');
     }
 };
