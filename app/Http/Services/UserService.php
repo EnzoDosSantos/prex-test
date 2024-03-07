@@ -7,6 +7,7 @@ use App\Models\Gifts;
 use App\Http\Helpers\CacheClient;
 use App\Http\Helpers\HttpClient;
 use App\Http\Helpers\ResponseFormater;
+use App\Models\UserGifts;
 
 class UserService
 {
@@ -66,6 +67,31 @@ class UserService
         $this->cache->set($cacheKey, $gift, 120);
 
         return $gift;
+    }
+
+    public function updateOrDeleteGift(int $userId, int $giftId, string $giftAlias): object
+    {
+        $gift = UserGifts::where('user_id', $userId)
+                        ->where('gift_id', $giftId)
+                        ->first();
+
+        if(isset($gift)){
+            $gift->delete();
+
+            $message = 'Gif has been removed from favorites.';
+            $code = 200;
+        } else {
+            UserGifts::create([
+                'user_id' => $userId,
+                'gift_id' => $giftId,
+                'alias' => $giftAlias
+            ]);
+
+            $message = 'The gift has been saved in favorites.';
+            $code = 201;
+        }
+
+        return (object) ['message' => $message, 'code' => $code];
     }
 
     private function searchExternalGift(string $identifier): array

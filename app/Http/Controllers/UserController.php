@@ -6,7 +6,6 @@ use Exception;
 use App\Http\Utils\RequestValidator;
 use Illuminate\Http\Request;
 use App\Http\Services\UserService;
-use App\Models\UserGifts;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
@@ -90,27 +89,9 @@ class UserController extends Controller
                 throw new Exception('Unauthorized or expired token.', 401);
             }
 
-            $gift = UserGifts::where('user_id', $userId)
-                            ->where('gift_id', $giftId)
-                            ->first();
+            $response = $this->userService->updateOrDeleteGift($userId, $giftId, $giftAlias);
 
-            if(isset($gift)){
-                $gift->delete();
-
-                $message = 'Gif has been removed from favorites.';
-                $code = 200;
-            } else {
-                UserGifts::create([
-                    'user_id' => $userId,
-                    'gift_id' => $giftId,
-                    'alias' => $giftAlias
-                ]);
-
-                $message = 'The gift has been saved in favorites.';
-                $code = 201;
-            }
-
-            return response()->json(['message' => $message], $code, [], JSON_UNESCAPED_SLASHES);
+            return response()->json(['message' => $response->message], $response->code, [], JSON_UNESCAPED_SLASHES);
         } catch (Exception $e) {
             return $this->handleException($e);
         }
