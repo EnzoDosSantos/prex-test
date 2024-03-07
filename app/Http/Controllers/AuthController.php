@@ -24,7 +24,7 @@ class AuthController extends Controller
 
             $credentials = $request->only(['email', 'password']);
 
-            $token = $this->authService->validateUserCredentials($credentials);
+            $token = $this->authService->createUserSession('email_password', $credentials);
 
             return response()->json(['token' => $token], 200);
         } catch (Exception $e) {
