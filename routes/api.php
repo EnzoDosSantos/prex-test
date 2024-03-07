@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,4 +17,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function(){
     Route::post('/login', [AuthController::class, 'createSession']);
+});
+
+
+Route::prefix('users')->middleware('auth:sanctum')->group(function(){
+    Route::get('/gifts', [UserController::class, 'searchGifts']);
+    Route::get('/gift', [UserController::class, 'searchGift']);
 });

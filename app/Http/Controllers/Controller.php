@@ -19,9 +19,14 @@ class Controller extends BaseController
         if($code === 400){
             $error = json_decode($exception->getMessage());
         } else {
+
+            if($code === 0){
+                $code = 500;
+            }
+
             $error = $exception->getMessage();
         }
 
-        return response()->json(['error' => $error], $code);
+        return response()->json(['error' => $error], $code, ['Content-Type' => 'application/json']);
     }
 }
