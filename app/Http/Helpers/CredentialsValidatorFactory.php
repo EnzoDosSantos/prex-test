@@ -4,6 +4,7 @@ namespace App\Http\Helpers;
 
 use Exception;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 interface ICredentialsValidator
@@ -36,6 +37,8 @@ class EmailPasswordValidator implements ICredentialsValidator
         if(!isset($user) || !Hash::check($credentials['password'], $user->password)) {
             throw new Exception('Invalid credentials.', 401);
         }
+
+        Auth::login($user);
 
         return $user;
     }

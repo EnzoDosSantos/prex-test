@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('auth')->group(function(){
-    Route::post('/login', [AuthController::class, 'createSession']);
+    Route::post('/login', [AuthController::class, 'createSession'])->middleware('log:SESSION');
 });
 
 
