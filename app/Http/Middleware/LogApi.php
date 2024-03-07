@@ -6,6 +6,7 @@ use Closure;
 use App\Models\LogApp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class LogApi
 {
@@ -30,13 +31,33 @@ class LogApi
             return;
         }
 
+        $requestHttp = $request->getContent();
+
+        $decodedRequest = json_decode($requestHttp);
+
+        if(!isset($decodedRequest)){
+            $requestToStore = json_encode((object) []);
+        } else {
+            $requestToStore = $requestHttp;
+        }
+
+        $responseHttp = $response->getContent();
+
+        $decodedResponse = json_decode($responseHttp);
+
+        if(!isset($decodedResponse)){
+            $responseToStore = json_encode((object) []);
+        } else {
+            $responseToStore = $responseHttp;
+        }
+
         $requestService = $request->service ?? 'UNKNOWN';
 
         LogApp::create([
             'user_id' => $user->id,
             'service' => $requestService,
-            'request' => $request->getContent(),
-            'response' => $response->getContent(),
+            'request' => $requestToStore,
+            'response' => $responseToStore,
             'endpoint' => $request->fullUrl(),
             'status' => $response->status(),
             'method' => $request->getMethod(),
