@@ -92,7 +92,14 @@ class UserService
 
     private function searchInternalGift(int $identifier): array
     {
-        $gift = Gifts::find($identifier);
+
+        if(is_numeric($identifier)){
+            $gift = Gifts::find($identifier);
+        } else {
+            $gift = Gifts::where('external_id', $identifier)
+                        ->first();
+        }
+
 
         if(!isset($gift)){
             throw new Exception("No results available on search: $identifier" , 404);

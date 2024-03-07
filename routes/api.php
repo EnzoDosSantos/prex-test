@@ -28,4 +28,5 @@ Route::prefix('external')->middleware('auth:sanctum')->group(function(){
 Route::prefix('internal')->middleware('auth:sanctum')->group(function(){
     Route::get('/gifts', [UserController::class, 'searchInternalGifts'])->middleware('log:INTERNAL_SEARCH_GIFTS');
     Route::get('/gift/{id}', [UserController::class, 'searchInternalGift'])->middleware('log:INTERNAL_SEARCH_GIFT');
+    Route::post('/gift', [UserController::class, 'updateFavouriteGift'])->middleware('log:INTERNAL_FAVOURITE_GIFT');
 });

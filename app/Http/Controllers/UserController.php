@@ -6,7 +6,9 @@ use Exception;
 use App\Http\Utils\RequestValidator;
 use Illuminate\Http\Request;
 use App\Http\Services\UserService;
+use App\Models\UserGifts;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -68,6 +70,47 @@ class UserController extends Controller
             $response = $this->userService->searchGift('INTERNAL', $id);
 
             return response()->json(['gift' => $response], 200, [], JSON_UNESCAPED_SLASHES);
+        } catch (Exception $e) {
+            return $this->handleException($e);
+        }
+    }
+
+    public function updateFavouriteGift(Request $request): JsonResponse
+    {
+        try {
+            new RequestValidator($request, 'setFavouriteGift');
+
+            $giftId = $request->input('id');
+            $giftAlias = $request->input('alias');
+            $userId = $request->input('user_id');
+
+            $user = Auth::user();
+
+            if($user->id !== $userId){
+                throw new Exception('Unauthorized or expired token.', 401);
+            }
+
+            $gift = UserGifts::where('user_id', $userId)
+                            ->where('gift_id', $giftId)
+                            ->first();
+
+            if(isset($gift)){
+                $gift->delete();
+
+                $message = 'Gif has been removed from favorites.';
+                $code = 200;
+            } else {
+                UserGifts::create([
+                    'user_id' => $userId,
+                    'gift_id' => $giftId,
+                    'alias' => $giftAlias
+                ]);
+
+                $message = 'The gift has been saved in favorites.';
+                $code = 201;
+            }
+
+            return response()->json(['message' => $message], $code, [], JSON_UNESCAPED_SLASHES);
         } catch (Exception $e) {
             return $this->handleException($e);
         }
