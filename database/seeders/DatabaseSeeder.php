@@ -2,8 +2,11 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Gifs;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Faker\Factory as Faker;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -12,11 +15,45 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
+        $this->seedUserTable();
+        $this->seedGifTable();
+    }
 
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+    private function seedUserTable(): void
+    {
+        $faker = Faker::create();
+
+        foreach(range(1, 5) as $idx) {
+            DB::table('prex_user')->insert([
+                'email' => $faker->unique()->safeEmail,
+                'password' => Hash::make('password'),
+            ]);
+        }
+
+        DB::table('prex_user')->insert([
+            'email' => 'test@test.com',
+            'password' => Hash::make('password'),
+        ]);
+    }
+
+    private function seedGifTable(): void
+    {
+        $faker = Faker::create('es_ES');
+
+        $gifs = [];
+
+        foreach(range(1, 50) as $idx){
+
+            $toInsertGif = [];
+
+            $toInsertGif['external_id'] = $faker->uuid;
+            $toInsertGif['title'] = $faker->realText;
+            $toInsertGif['url'] = $faker->url();
+
+            $gifs[] = $toInsertGif;
+
+        }
+
+        Gifs::insert($gifs);
     }
 }

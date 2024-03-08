@@ -1,6 +1,7 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +15,18 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::prefix('auth')->group(function(){
+    Route::post('/login', [AuthController::class, 'createSession'])->middleware('log:SESSION');
+});
+
+
+Route::prefix('external')->middleware('auth:sanctum')->group(function(){
+    Route::get('/gifs', [UserController::class, 'searchExternalGifs'])->middleware('log:EXTERNAL_SEARCH_GIFS');
+    Route::get('/gif', [UserController::class, 'searchExternalGif'])->middleware('log:EXTERNAL_SEARCH_GIF');
+});
+
+Route::prefix('internal')->middleware('auth:sanctum')->group(function(){
+    Route::get('/gifs', [UserController::class, 'searchInternalGifs'])->middleware('log:INTERNAL_SEARCH_GIFS');
+    Route::get('/gif/{id}', [UserController::class, 'searchInternalGif'])->middleware('log:INTERNAL_SEARCH_GIF');
+    Route::post('/gif', [UserController::class, 'updateFavouriteGif'])->middleware('log:INTERNAL_FAVOURITE_GIF');
 });

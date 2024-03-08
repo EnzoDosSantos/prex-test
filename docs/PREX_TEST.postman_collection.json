@@ -1,0 +1,592 @@
+{
+	"info": {
+		"_postman_id": "b99fe795-1cc4-4f25-93a1-a580ae42d316",
+		"name": "PREX_TEST",
+		"description": "Documentación de los distintos servicios realizados con PHP 8.2 FPM - Laravel 10 - Nginx y MySQL.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33438110"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Create login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.sendRequest({\r",
+									"    url: \"http://localhost/v1/auth/login\",\r",
+									"    method: \"POST\",\r",
+									"    header: {\r",
+									"        \"Content-Type\": \"application/json\"\r",
+									"    },\r",
+									"    body: {\r",
+									"        mode: \"raw\",\r",
+									"        raw: JSON.stringify({\r",
+									"            \"email\": \"test@test.com\",\r",
+									"            \"password\": \"password\"\r",
+									"        })\r",
+									"    }\r",
+									"}, function (err, res) {\r",
+									"    if (err) {\r",
+									"        console.error(err);\r",
+									"    } else {\r",
+									"        const newToken = res.json().token;\r",
+									"        pm.environment.set(\"auth_token\", newToken);\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"test@test.com\",\r\n    \"password\":\"password\"\r\n}\r\n\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}auth/login",
+							"host": [
+								"{{base_url}}auth"
+							],
+							"path": [
+								"login"
+							]
+						},
+						"description": "Ejemplo de solicitud exitosa:\n\n``` json\n{\n    \"token\": \"0oGjiwEy1t2sKguS7nGWAExicpAslHB9JR39xvQ3de31a551\"\n}\n\n ```\n\nEjemplo de solicitud fallida:\n\n``` json\n{\n    \"error\": \"Invalid credentials.\"\n}\n\n ```"
+					},
+					"response": []
+				}
+			],
+			"description": "En esta colección, tenemos los endpoints encargados de proporcionarnos tokens de sesión para los diferentes usuarios; cada token tiene una duración de 30 minutos."
+		},
+		{
+			"name": "Gifs",
+			"item": [
+				{
+					"name": "External",
+					"item": [
+						{
+							"name": "Get external gifs",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.sendRequest({\r",
+											"    url: \"http://localhost/v1/auth/login\",\r",
+											"    method: \"POST\",\r",
+											"    header: {\r",
+											"        \"Content-Type\": \"application/json\"\r",
+											"    },\r",
+											"    body: {\r",
+											"        mode: \"raw\",\r",
+											"        raw: JSON.stringify({\r",
+											"            \"email\": \"test@test.com\",\r",
+											"            \"password\": \"password\"\r",
+											"        })\r",
+											"    }\r",
+											"}, function (err, res) {\r",
+											"    if (err) {\r",
+											"        console.error(err);\r",
+											"    } else {\r",
+											"        const newToken = res.json().token;\r",
+											"        pm.environment.set(\"auth_token\", newToken);\r",
+											"    }\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}external/gifs?query={{query}}&limit={{limit}}&offset={{offset}}",
+									"host": [
+										"{{base_url}}external"
+									],
+									"path": [
+										"gifs"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "{{query}}"
+										},
+										{
+											"key": "limit",
+											"value": "{{limit}}"
+										},
+										{
+											"key": "offset",
+											"value": "{{offset}}"
+										}
+									]
+								},
+								"description": "Este endpoint realiza la búsqueda mediante el parámetro 'query' y obtiene un máximo de 50 coincidencias.\n\nLos datos de busqueda se pueden enviar tanto por JSON Body como por Query params.\n\nEjemplo de JSON Body:\n\n``` json\n{\n    \"query\":\"test\",\n    \"limit\":20,\n    \"offset\":0\n}\n\n ```\n\nLos campos 'limit' y 'offset' son opcionales y tienen un valor por defecto de 10 y 0, respectivamente.\n\nEjemplo de solicitud exitosa:\n\n``` json\n{\n    \"gifs\": [\n        {\n            \"external_id\": \"a93jwI0wkWTQs\",\n            \"url\": \"https://giphy.com/embed/a93jwI0wkWTQs\",\n            \"title\": \"backing up homer simpson GIF\"\n        },\n        {\n            \"external_id\": \"Zk9mW5OmXTz9e\",\n            \"url\": \"https://giphy.com/embed/Zk9mW5OmXTz9e\",\n            \"title\": \"Salivating Homer Simpson GIF\"\n        }\n    ]\n}\n\n ```"
+							},
+							"response": []
+						},
+						{
+							"name": "Get external gif",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.sendRequest({\r",
+											"    url: \"http://localhost/v1/auth/login\",\r",
+											"    method: \"POST\",\r",
+											"    header: {\r",
+											"        \"Content-Type\": \"application/json\"\r",
+											"    },\r",
+											"    body: {\r",
+											"        mode: \"raw\",\r",
+											"        raw: JSON.stringify({\r",
+											"            \"email\": \"test@test.com\",\r",
+											"            \"password\": \"password\"\r",
+											"        })\r",
+											"    }\r",
+											"}, function (err, res) {\r",
+											"    if (err) {\r",
+											"        console.error(err);\r",
+											"    } else {\r",
+											"        const newToken = res.json().token;\r",
+											"        pm.environment.set(\"auth_token\", newToken);\r",
+											"    }\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}external/gif?id={{id}}",
+									"host": [
+										"{{base_url}}external"
+									],
+									"path": [
+										"gif"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "{{id}}"
+										}
+									]
+								},
+								"description": "Este endpoint realiza la búsqueda directa mediante el parametro 'id'.\n\nLos datos de busqueda se pueden enviar tanto por JSON Body como por Query params.\n\nEjemplo de JSON Body:\n\n``` json\n{\n    \"id\":\"external_id\"\n}\n\n ```\n\nEjemplo de solicitud exitosa:\n\n``` json\n{\n    \"gif\": {\n        \"external_id\": \"gw3IWyGkC0rsazTi\",\n        \"url\": \"https://giphy.com/embed/gw3IWyGkC0rsazTi\",\n        \"title\": \"Test Computer GIF\"\n    }\n}\n\n ```"
+							},
+							"response": []
+						}
+					],
+					"description": "Servicios de obtención de Gifs externos.\n\nCuando se obtiene una respuesta válida, los GIFs obtenidos se almacenan en caché y, simultáneamente, en la base de datos para luego poder ser consumidos por los endpoints internos."
+				},
+				{
+					"name": "Internal",
+					"item": [
+						{
+							"name": "Get internal gifs",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.sendRequest({\r",
+											"    url: \"http://localhost/v1/auth/login\",\r",
+											"    method: \"POST\",\r",
+											"    header: {\r",
+											"        \"Content-Type\": \"application/json\"\r",
+											"    },\r",
+											"    body: {\r",
+											"        mode: \"raw\",\r",
+											"        raw: JSON.stringify({\r",
+											"            \"email\": \"test@test.com\",\r",
+											"            \"password\": \"password\"\r",
+											"        })\r",
+											"    }\r",
+											"}, function (err, res) {\r",
+											"    if (err) {\r",
+											"        console.error(err);\r",
+											"    } else {\r",
+											"        const newToken = res.json().token;\r",
+											"        pm.environment.set(\"auth_token\", newToken);\r",
+											"    }\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"query\":{{query}},\r\n    \"limit\":{{limit}},\r\n    \"offset\":{{offset}}\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}internal/gifs?query={{query}}",
+									"host": [
+										"{{base_url}}internal"
+									],
+									"path": [
+										"gifs"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "{{query}}"
+										},
+										{
+											"key": "limit",
+											"value": "{{limit}}",
+											"disabled": true
+										},
+										{
+											"key": "offset",
+											"value": "{{offset}}",
+											"disabled": true
+										}
+									]
+								},
+								"description": "Este endpoint realiza la búsqueda mediante el parámetro 'query' y obtiene tantas coincidencias como pueda.\n\nLos datos de busqueda se pueden enviar tanto por JSON Body como por Query params.\n\nEjemplo de JSON Body:\n\n``` json\n{\n    \"query\":\"test\",\n    \"limit\":20,\n    \"offset\":0\n}\n\n ```\n\nLos campos 'limit' y 'offset' son opcionales y tienen un valor por defecto de 10 y 0, respectivamente.\n\nEjemplo de solicitud exitosa:\n\n``` json\n{\n    \"gifs\": [\n        {\n            \"external_id\": \"a93jwI0wkWTQs\",\n            \"url\": \"https://giphy.com/embed/a93jwI0wkWTQs\",\n            \"title\": \"backing up homer simpson GIF\"\n        },\n        {\n            \"external_id\": \"Zk9mW5OmXTz9e\",\n            \"url\": \"https://giphy.com/embed/Zk9mW5OmXTz9e\",\n            \"title\": \"Salivating Homer Simpson GIF\"\n        }\n    ]\n}\n\n ```"
+							},
+							"response": []
+						},
+						{
+							"name": "Get internal gif",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.sendRequest({\r",
+											"    url: \"http://localhost/v1/auth/login\",\r",
+											"    method: \"POST\",\r",
+											"    header: {\r",
+											"        \"Content-Type\": \"application/json\"\r",
+											"    },\r",
+											"    body: {\r",
+											"        mode: \"raw\",\r",
+											"        raw: JSON.stringify({\r",
+											"            \"email\": \"test@test.com\",\r",
+											"            \"password\": \"password\"\r",
+											"        })\r",
+											"    }\r",
+											"}, function (err, res) {\r",
+											"    if (err) {\r",
+											"        console.error(err);\r",
+											"    } else {\r",
+											"        const newToken = res.json().token;\r",
+											"        pm.environment.set(\"auth_token\", newToken);\r",
+											"    }\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}internal/gif/{{id}}",
+									"host": [
+										"{{base_url}}internal"
+									],
+									"path": [
+										"gif",
+										"{{id}}"
+									]
+								},
+								"description": "Este endpoint realiza la búsqueda directa mediante el parámetro 'id', presente en la URL [http://localhost/v1/internal/gif/ID-OR_EXTERNAL_ID](http://localhost/v1/internal/gif/ID-OR_EXTERNAL_ID). El tipo de dato de 'id' puede ser tanto un entero como un string.  \n\nEjemplo de solicitud exitosa:\n\n``` json\n{\n    \"gif\": {\n        \"external_id\": \"gw3IWyGkC0rsazTi\",\n        \"url\": \"https://giphy.com/embed/gw3IWyGkC0rsazTi\",\n        \"title\": \"Test Computer GIF\"\n    }\n}\n\n ```"
+							},
+							"response": []
+						},
+						{
+							"name": "Manage favourite Gifs",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.sendRequest({\r",
+											"    url: \"http://localhost/v1/auth/login\",\r",
+											"    method: \"POST\",\r",
+											"    header: {\r",
+											"        \"Content-Type\": \"application/json\"\r",
+											"    },\r",
+											"    body: {\r",
+											"        mode: \"raw\",\r",
+											"        raw: JSON.stringify({\r",
+											"            \"email\": \"test@test.com\",\r",
+											"            \"password\": \"password\"\r",
+											"        })\r",
+											"    }\r",
+											"}, function (err, res) {\r",
+											"    if (err) {\r",
+											"        console.error(err);\r",
+											"    } else {\r",
+											"        const newToken = res.json().token;\r",
+											"        pm.environment.set(\"auth_token\", newToken);\r",
+											"    }\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{auth_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\":3,\r\n    \"user_id\":6,\r\n    \"alias\":\"Buen Gif.\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}internal/gif",
+									"host": [
+										"{{base_url}}internal"
+									],
+									"path": [
+										"gif"
+									]
+								},
+								"description": "Este endpoint guarda o elimina un 'favorito' en la base de datos.\n\nLos datos también pueden ser enviados mediante Query params.\n\nRespuesta al guardar un favorito:\n\n``` json\n{\n    \"message\": \"The gif has been saved in favorites.\"\n}\n\n ```\n\nRespuesta al eliminarlo de favoritos:\n\n``` json\n{\n    \"message\": \"Gif has been removed from favorites.\"\n}\n\n ```"
+							},
+							"response": []
+						}
+					],
+					"description": "Servicios de obtención de Gifs internos.\n\nCuando se obtiene una respuesta válida, los GIFs obtenidos se almacenan en caché."
+				}
+			],
+			"description": "Los servicios de Gifs estan sepados entre servicios que utilizan proveedores externos (GHIPY) y proveedores internos, en este caso es la base de datos."
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{auth_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost/v1/"
+		},
+		{
+			"key": "auth_token",
+			"value": "tYC1E6D3tw2XVcBiMwOhxyXM2qidm3izk7fW5FIR96e4b7fb",
+			"type": "string"
+		},
+		{
+			"key": "query",
+			"value": "test",
+			"type": "string"
+		},
+		{
+			"key": "limit",
+			"value": "5",
+			"type": "string"
+		},
+		{
+			"key": "offset",
+			"value": "0",
+			"type": "string"
+		},
+		{
+			"key": "id",
+			"value": "gw3IWyGkC0rsazTi",
+			"type": "string"
+		}
+	]
+}

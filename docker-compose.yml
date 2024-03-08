@@ -1,0 +1,64 @@
+version: '3'
+services:
+
+  # PHP Service
+  app:
+    image: app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DB_HOST: 'mysql'
+    working_dir: /var/www
+    networks:
+      - app-network
+    depends_on:
+      - mysql
+    command: bash -c "php artisan migrate:refresh && php artisan db:seed && php-fpm"
+
+  # Nginx Service
+  webserver:
+    image: nginx:alpine
+    container_name: webserver
+    restart: unless-stopped
+    tty: true
+    user: root
+    ports:
+      - "80:80"
+    volumes:
+      - ./:/var/www
+      - ./docker/config/nginx/nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - app-network
+
+  # Mysql Service
+  mysql:
+    container_name: db
+    restart: unless-stopped
+    image: mysql:latest
+    platform: linux/x86_64
+    ports:
+     - "3306:3306"
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    volumes:
+      - dbdata:/var/lib/mysql/
+      - ./mysql/my.cnf:/etc/mysql/my.cnf
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local
