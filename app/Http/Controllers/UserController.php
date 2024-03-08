@@ -63,7 +63,7 @@ class UserController extends Controller
         }
     }
 
-    public function searchInternalGif(Request $request, int $id): JsonResponse
+    public function searchInternalGif(Request $request, string | int $id): JsonResponse
     {
         try {
             $response = $this->userService->searchGif('INTERNAL', $id);

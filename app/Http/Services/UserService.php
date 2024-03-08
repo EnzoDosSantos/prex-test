@@ -48,7 +48,7 @@ class UserService
         return $gifs;
     }
 
-    public function searchGif(string $driver, string $identifier): array
+    public function searchGif(string $driver, string | int $identifier): array
     {
         $cacheKey = $identifier . '_driver_' . $driver;
 
@@ -94,7 +94,7 @@ class UserService
         return (object) ['message' => $message, 'code' => $code];
     }
 
-    private function searchExternalGif(string $identifier): array
+    private function searchExternalGif(string | int $identifier): array
     {
         $token = 'AhYIFREbw68cipBiUT9YxHAmBhCWu8mz';
 
@@ -116,7 +116,7 @@ class UserService
         return $output[0];
     }
 
-    private function searchInternalGif(int $identifier): array
+    private function searchInternalGif(string | int $identifier): array
     {
 
         if(is_numeric($identifier)){
