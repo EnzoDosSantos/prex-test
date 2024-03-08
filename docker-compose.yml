@@ -10,7 +10,7 @@ services:
     container_name: app
     restart: unless-stopped
     env_file:
-      - .env
+      - .env.example
     environment:
       DB_HOST: 'mysql'
     working_dir: /var/www
